@@ -16,24 +16,57 @@
 */
 
 #include "app.h"
+#include <iostream>
+#include <fstream>
 
 IMPLEMENT_APP(QSPApp)
 
+std::ofstream log_stream;
+wxLogStream * logger;
+wxLogFormatter * formatter;
+
 bool QSPApp::OnInit()
 {
-	wxLog::EnableLogging(false);
+	wxLog::EnableLogging(true);
+
+	log_stream.open("qspgui_log.txt");
+	logger = new wxLogStream(&log_stream);
+	//logger->SetTimestamp("%Y-%m-%d %H:%M:%S");
+	//formatter = logger->SetFormatter(new wxLogFormatter());
+	wxHandleFatalExceptions(true);
 	wxInitAllImageHandlers();
 	QSPInit();
-	InitUI();
+	logger->LogText("qsp initialized");
+
+	try { InitUI(); }
+	catch (...)
+	{
+		logger->LogText("exception during ui initialization.");
+	}
+
+	logger->LogText("ui initialized");
 	return true;
 }
 
+void QSPApp::OnFatalException()
+{
+	logger->LogText("fatal exception happened.");
+	this->OnExit();
+};
+
 int QSPApp::OnExit()
 {
+	logger->LogText("Uninitializing ...");
+
 	QSPDeInit();
 	QSPCallBacks::DeInit();
 	delete m_transhelper;
 	wxTheClipboard->Flush();
+	
+	logger->Flush();
+	delete logger;
+
+	log_stream.close();
 	return wxApp::OnExit();
 }
 
@@ -44,15 +77,20 @@ void QSPApp::InitUI()
 	wxString configPath = appPathString + QSP_CONFIG;
 	if (!(wxFileExists(configPath) || wxFileName::IsDirWritable(appPathString)))
 		configPath = wxFileName(wxStandardPaths::Get().GetUserConfigDir(), QSP_CONFIG).GetFullPath();
+	logger->LogText("files initialized.");
 	// ----------------------
 	QSPFrame * frame = new QSPFrame(configPath, m_transhelper);
+	logger->LogText("frame created.");
 	frame->LoadSettings();
+	logger->LogText("frame: settings applied.");
 	frame->EnableControls(false);
 	QSPCallBacks::Init(frame);
+	logger->LogText("frame initialized.");
 	// ----------------------
 	wxInitEvent initEvent;
 	if (GetAutoRunEvent(initEvent))
 		wxPostEvent(frame, initEvent);
+	logger->LogText("events initialized.");
 }
 
 bool QSPApp::GetAutoRunEvent(wxInitEvent& initEvent)

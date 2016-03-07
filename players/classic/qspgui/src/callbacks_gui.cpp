@@ -135,9 +135,11 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	else
 		m_frame->GetDesc()->LoadBackImage(wxEmptyString);
 	// -------------------------------
-	m_frame->ApplyParams();
+	//MJ: Moved to inside avoid constant update.
+	//m_frame->ApplyParams();
 	if (isRedraw)
 	{
+		m_frame->ApplyParams();
 		m_frame->EnableControls(false, true);
 		m_frame->Update();
 		wxTheApp->Yield(true);
