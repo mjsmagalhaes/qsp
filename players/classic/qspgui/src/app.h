@@ -31,6 +31,7 @@
 		// Overloaded methods
 		virtual bool OnInit();
 		virtual int OnExit();
+		void OnFatalException();
 	protected:
 		void InitUI();
 		bool GetAutoRunEvent(wxInitEvent& initEvent);
