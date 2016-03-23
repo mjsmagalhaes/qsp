@@ -29,7 +29,7 @@ bool QSPApp::OnInit()
 {
 	wxLog::EnableLogging(true);
 
-	log_stream.open("qspgui_log.txt");
+	log_stream.open("log_qspgui.txt");
 	logger = new wxLogStream(&log_stream);
 	//logger->SetTimestamp("%Y-%m-%d %H:%M:%S");
 	//formatter = logger->SetFormatter(new wxLogFormatter());
