@@ -32,5 +32,10 @@
 	void qspSetError(int);
 	void qspResetError();
 	QSPString qspGetErrorDesc(int errorNum);
+	void qspLogError_c(QSP_CHAR * title, QSP_CHAR * buf);
+	void qspLogError_i(QSP_CHAR * title, int b);
+	void qspLogError_s(QSP_CHAR * title, QSPString * s);
+	QSP_CHAR * qspGetCodeString();
+	void qspSetCodeString(QSPString str);
 
 #endif

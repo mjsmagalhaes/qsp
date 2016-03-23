@@ -18,6 +18,8 @@
 #include "errors.h"
 #include "text.h"
 
+#include <wchar.h>
+
 int qspErrorNum = 0;
 int qspErrorLoc = -1;
 int qspErrorLine = 0;
@@ -25,6 +27,8 @@ int qspErrorActIndex = -1;
 int qspRealCurLoc = -1;
 int qspRealLine = 0;
 int qspRealActIndex = -1;
+
+QSP_CHAR * cmd_line = NULL;
 
 void qspSetError(int num)
 {
@@ -35,6 +39,8 @@ void qspSetError(int num)
 		qspErrorActIndex = qspRealActIndex;
 		qspErrorLine = qspRealLine;
 	}
+
+	qspLogError_c(L"ERROR", cmd_line);
 }
 
 void qspResetError()
@@ -80,4 +86,40 @@ QSPString qspGetErrorDesc(int errorNum)
 	default: str = QSP_STATIC_STR(QSP_FMT("Unknown error!")); break;
 	}
 	return str;
+}
+
+QSP_CHAR * qspGetCodeString()
+{
+	return cmd_line;
+}
+
+void qspSetCodeString(QSPString str)
+{
+	if (cmd_line)
+	{
+		free(cmd_line);
+	}
+
+	cmd_line = qspStringToC(str);
+}
+
+void qspLogError_c(QSP_CHAR * title, QSP_CHAR * buf)
+{
+	//FILE * file = fopen("log_qspdll.txt", "a");
+	//fwprintf(file, L"%s:%s\n", title, buf);
+	//fclose(file);
+}
+
+void qspLogError_i(QSP_CHAR * title, int b)
+{
+	static QSP_CHAR buf[10];
+	swprintf(buf, 10, L"%d", b);
+	qspLogError_c(title, buf);
+}
+
+void qspLogError_s(QSP_CHAR * title, QSPString * s)
+{
+	QSP_CHAR * buf = qspStringToC(*s);
+	qspLogError_c(title, buf);
+	free(buf);
 }
